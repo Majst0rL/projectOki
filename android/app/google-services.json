@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "662717044599",
+    "project_id": "projectoki-lk",
+    "storage_bucket": "projectoki-lk.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:662717044599:android:1551c08cbe2a836c96f372",
+        "android_client_info": {
+          "package_name": "com.example.oki"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQ8N18b1WMSiWjVl4qWV46zO3YIDN0Sus"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
