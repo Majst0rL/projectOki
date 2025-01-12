@@ -1,6 +1,11 @@
 //presentation/screens/home_screen.dart
 
 import 'package:flutter/material.dart';
+import 'review_screen.dart';
+import 'favorites_screen.dart';
+import 'home_content_screen.dart';
+import 'ai_screen.dart';
+import 'search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -11,11 +16,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _tabs = [
-    Center(child: Text("Rewiev Section", style: TextStyle(color: Colors.green))),
-    Center(child: Text("Favorites Section", style: TextStyle(color: Colors.green))),
-    Center(child: Text("Home Section", style: TextStyle(color: Colors.green))),
-    Center(child: Text("AI Section", style: TextStyle(color: Colors.green))),
-    Center(child: Text("Search Section", style: TextStyle(color: Colors.green))),
+    ReviewScreen(),
+    FavoritesScreen(),
+    HomeContentScreen(),
+    AiScreen(),
+    SearchScreen(),
   ];
 
   @override
@@ -101,5 +106,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
