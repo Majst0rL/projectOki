@@ -1,25 +1,54 @@
-//presentation/screens/home_content_screen.dart
-import 'package:flutter/material.dart';
-import '../../widgets/movie_card.dart';
+//presentation/home_content_screen.dart
 
-class HomeContentScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'lib\service\firebase_service.dart';
+import 'lib\presentation\widgets\movie_card.dart';
+
+class HomeContentScreen extends StatefulWidget {
+  @override
+  _HomeContentScreenState createState() => _HomeContentScreenState();
+}
+
+class _HomeContentScreenState extends State<HomeContentScreen> {
+  final FirebaseService _firebaseService = FirebaseService();
+  List<Map<String, dynamic>> _movies = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMovies();
+  }
+
+  Future<void> _loadMovies() async {
+    try {
+      final movies = await _firebaseService.fetchMoviesFromFirestore();
+      setState(() {
+        _movies = movies;
+      });
+    } catch (e) {
+      print('Failed to load movies: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        padding: EdgeInsets.all(10),
-        children: [
-          MovieCard(
-            title: "The Shawshank Redemption",
-            imageUrl:
-                "https://s29288.pcdn.co/wp-content/uploads/2010/03/shawshank-redemption-poster-1.jpg", // Replace with a real URL
-            genre: "Drama",
-            year: "1994",
-            rating: 4.5,
-          ),
-          // Add more MovieCards
-        ],
-      ),
+      body: _movies.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              padding: EdgeInsets.all(10),
+              itemCount: _movies.length,
+              itemBuilder: (context, index) {
+                final movie = _movies[index];
+                return MovieCard(
+                  title: movie['title'],
+                  imageUrl: movie['poster_path'],
+                  genre: movie['genre'],
+                  year: movie['release_date'],
+                  rating: movie['vote_average'],
+                );
+              },
+            ),
     );
   }
 }

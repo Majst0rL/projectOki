@@ -1,4 +1,8 @@
+//lib/presentation/widgets/movie_card.dart
+
 import 'package:flutter/material.dart';
+import 'lib\service\tmbd_service.dart';
+import 'lib\service\firebase_service.dart';
 
 class MovieCard extends StatelessWidget {
   final String title;
