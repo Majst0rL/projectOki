@@ -1,8 +1,8 @@
 //presentation/home_content_screen.dart
 
 import 'package:flutter/material.dart';
-import 'lib\service\firebase_service.dart';
-import 'lib\presentation\widgets\movie_card.dart';
+import '../service/firebase_service.dart';
+import '../widgets/movie_card.dart';
 
 class HomeContentScreen extends StatefulWidget {
   @override

@@ -2,8 +2,8 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../service/tmdb_service.dart';
-import '../../service/firebase_service.dart';
+import '../service/tmdb_service.dart';
+import '../service/firebase_service.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
