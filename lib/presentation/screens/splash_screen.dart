@@ -2,8 +2,6 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../service/tmdb_service.dart';
-import '../service/firebase_service.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -12,26 +10,16 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final TmdbService _tmdbService = TmdbService();
-  final FirebaseService _firebaseService = FirebaseService();
-
   @override
   void initState() {
     super.initState();
-    _fetchAndSaveMovies();
-  }
-
-  Future<void> _fetchAndSaveMovies() async {
-    try {
-      final movies = await _tmdbService.fetchMovies();
-      await _firebaseService.saveMoviesToFirestore(movies);
+    // Preusmeritev na HomePage po 2 sekundah
+    Timer(Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
-    } catch (e) {
-      print('Error during initialization: $e');
-    }
+    });
   }
 
   @override

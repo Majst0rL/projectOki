@@ -1,9 +1,7 @@
-//main.dart
-
+// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'presentation/screens/splash_screen.dart';
-
+import 'presentation/screens/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); 
@@ -16,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(), // Starts with the SplashScreen
+      home: LoginScreen(), // Starts with the LoginScreen
     );
   }
 }

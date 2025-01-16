@@ -20,15 +20,19 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
   }
 
   Future<void> _loadMovies() async {
-    try {
-      final movies = await _firebaseService.fetchMoviesFromFirestore();
-      setState(() {
-        _movies = movies;
-      });
-    } catch (e) {
-      print('Failed to load movies: $e');
+  try {
+    final movies = await _firebaseService.fetchMoviesFromFirestore();
+    for (var movie in movies) {
+      print('Movie: ${movie['title']}, Genre IDs: ${movie['genre_ids']}');
     }
+    setState(() {
+      _movies = movies;
+    });
+  } catch (e) {
+    print('Failed to load movies: $e');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +44,13 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
               itemCount: _movies.length,
               itemBuilder: (context, index) {
                 final movie = _movies[index];
+                print('Passing movie data to MovieCard: $movie');
                 return MovieCard(
                   title: movie['title'],
                   imageUrl: movie['poster_path'],
-                  genre: movie['genre'],
-                  year: movie['release_date'],
-                  rating: movie['vote_average'],
+                  genreIds: List<int>.from(movie['genre_ids'] ?? []), // Pass a list of genre IDs
+                  releaseDate: movie['release_date'] ?? '',
+                  rating: movie['vote_average']?.toDouble() ?? 0.0,
                 );
               },
             ),

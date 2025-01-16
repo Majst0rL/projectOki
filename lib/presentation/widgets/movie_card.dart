@@ -1,22 +1,59 @@
 //lib/presentation/widgets/movie_card.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class MovieCard extends StatelessWidget {
   final String title;
   final String imageUrl;
-  final String genre;
-  final String year;
+  final List<int> genreIds;
+  final String releaseDate;
   final double rating;
 
   const MovieCard({
     Key? key,
     required this.title,
     required this.imageUrl,
-    required this.genre,
-    required this.year,
+    required this.genreIds,
+    required this.releaseDate,
     required this.rating,
   }) : super(key: key);
+
+  static const Map<int, String> genreMap = {
+    28: "Action",
+    12: "Adventure",
+    16: "Animation",
+    35: "Comedy",
+    80: "Crime",
+    99: "Documentary",
+    18: "Drama",
+    10751: "Family",
+    14: "Fantasy",
+    36: "History",
+    27: "Horror",
+    10402: "Music",
+    9648: "Mystery",
+    10749: "Romance",
+    878: "Science Fiction",
+    10770: "TV Movie",
+    53: "Thriller",
+    10752: "War",
+    37: "Western",
+  };
+
+
+  String getGenres(List<int> ids) {
+    return ids.map((id) => genreMap[id] ?? "Unknown").join(", ");
+  }
+
+  String formatDate(String date) {
+    try {
+      final parsedDate = DateTime.parse(date);
+      return DateFormat("dd.MM.yyyy").format(parsedDate);
+    } catch (e) {
+      return "Unknown";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,41 +68,41 @@ class MovieCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Movie Title
             Text(
               title,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             SizedBox(height: 10),
-            // Movie Image
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.network(
                 imageUrl,
-                height: 150,
+                height: 250,
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),
             ),
             SizedBox(height: 10),
-            // Genre and Year
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Genre
-                Text(
-                  "Genre: $genre",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
+                Expanded(
+                  child: Text(
+                    "Genre: ${getGenres(genreIds)}",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2, // Allow wrapping to two lines if needed
                   ),
                 ),
-                // Year
+
                 Text(
-                  "Year: $year",
+                  "Year: ${formatDate(releaseDate)}",
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[600],
@@ -74,14 +111,13 @@ class MovieCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 10),
-            // Reviews
             Row(
               children: [
                 Icon(Icons.star, color: Colors.yellow, size: 20),
                 Text(
                   " $rating/5",
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
