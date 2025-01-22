@@ -41,15 +41,17 @@ class MovieCard extends StatelessWidget {
     37: "Western",
   };
 
-
   String getGenres(List<int> ids) {
-    return ids.map((id) => genreMap[id] ?? "Unknown").join(", ");
+    print('Received Genre IDs: $ids'); // Debug received IDs
+    final genres = ids.map((id) => genreMap[id] ?? "Unknown").toList();
+    print('Mapped Genres: $genres'); // Debug mapped genres
+    return genres.isNotEmpty ? genres.join(", ") : "No genres available";
   }
 
   String formatDate(String date) {
     try {
       final parsedDate = DateTime.parse(date);
-      return DateFormat("dd.MM.yyyy").format(parsedDate);
+      return DateFormat("yyyy").format(parsedDate);
     } catch (e) {
       return "Unknown";
     }
@@ -91,7 +93,7 @@ class MovieCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    "Genre: ${getGenres(genreIds)}",
+                    "${getGenres(genreIds)}",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -100,9 +102,8 @@ class MovieCard extends StatelessWidget {
                     maxLines: 2, // Allow wrapping to two lines if needed
                   ),
                 ),
-
                 Text(
-                  "Year: ${formatDate(releaseDate)}",
+                  "${formatDate(releaseDate)}",
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[600],
@@ -115,7 +116,7 @@ class MovieCard extends StatelessWidget {
               children: [
                 Icon(Icons.star, color: Colors.yellow, size: 20),
                 Text(
-                  " $rating/5",
+                  " $rating",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
