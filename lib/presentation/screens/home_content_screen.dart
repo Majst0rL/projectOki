@@ -1,9 +1,8 @@
-//presentation/home_content_screen.dart
-
 import 'package:flutter/material.dart';
-import '../service/firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../service/firebase_service.dart';
 import '../widgets/movie_card.dart';
+import 'movie_detail_screen.dart';
 
 class HomeContentScreen extends StatefulWidget {
   @override
@@ -44,6 +43,10 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Home"),
+        backgroundColor: Colors.black,
+      ),
       body: _movies.isEmpty
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(
@@ -63,14 +66,24 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                     .toList();
                 print('Parsed genre IDs for "${movie['title']}": $genreIds');
 
-                return MovieCard(
-                  title: movie['title'],
-                  imageUrl: movie['poster_path'] ?? '',
-                  genreIds: genreIds, // Pass parsed genre IDs
-                  releaseDate: movie['release_date'] ?? '',
-                  rating: double.parse(
-                      (movie['vote_average']?.toDouble() ?? 0.0)
-                          .toStringAsFixed(1)),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MovieDetailScreen(movie: movie),
+                      ),
+                    );
+                  },
+                  child: MovieCard(
+                    title: movie['title'],
+                    imageUrl: movie['poster_path'] ?? '',
+                    genreIds: genreIds, // Pass parsed genre IDs
+                    releaseDate: movie['release_date'] ?? '',
+                    rating: double.parse(
+                        (movie['vote_average']?.toDouble() ?? 0.0)
+                            .toStringAsFixed(1)),
+                  ),
                 );
               },
             ),

@@ -1,9 +1,12 @@
 //lib/presentation/widgets/movie_card.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../service/firebase_service.dart';
+import '../../user_provider.dart';
 import 'package:intl/intl.dart';
 
-class MovieCard extends StatelessWidget {
+class MovieCard extends StatefulWidget {
   final String title;
   final String imageUrl;
   final List<int> genreIds;
@@ -19,32 +22,83 @@ class MovieCard extends StatelessWidget {
     required this.rating,
   }) : super(key: key);
 
-  static const Map<int, String> genreMap = {
-    28: "Action",
-    12: "Adventure",
-    16: "Animation",
-    35: "Comedy",
-    80: "Crime",
-    99: "Documentary",
-    18: "Drama",
-    10751: "Family",
-    14: "Fantasy",
-    36: "History",
-    27: "Horror",
-    10402: "Music",
-    9648: "Mystery",
-    10749: "Romance",
-    878: "Science Fiction",
-    10770: "TV Movie",
-    53: "Thriller",
-    10752: "War",
-    37: "Western",
-  };
+  @override
+  _MovieCardState createState() => _MovieCardState();
+}
+
+class _MovieCardState extends State<MovieCard> {
+  final FirebaseService _firebaseService = FirebaseService();
+  bool isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFavoriteStatus();
+  }
+
+  void _checkFavoriteStatus() async {
+    final userId = Provider.of<UserProvider>(context, listen: false).userId;
+    if (userId != null) {
+      final favoriteStatus =
+          await _firebaseService.isFavorite(userId, widget.title);
+      setState(() {
+        isFavorite = favoriteStatus;
+      });
+    }
+  }
+
+  void _toggleFavorite() async {
+    final userId = Provider.of<UserProvider>(context, listen: false).userId;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please log in to add favorites.')),
+      );
+      return;
+    }
+
+    setState(() {
+      isFavorite = !isFavorite;
+    });
+
+    final movie = {
+      'title': widget.title,
+      'poster_path': widget.imageUrl,
+      'genre_ids': widget.genreIds,
+      'release_date': widget.releaseDate,
+      'vote_average': widget.rating,
+    };
+
+    if (isFavorite) {
+      await _firebaseService.addFavorite(userId, movie);
+    } else {
+      await _firebaseService.removeFavorite(userId, movie);
+    }
+  }
 
   String getGenres(List<int> ids) {
-    print('Received Genre IDs: $ids'); // Debug received IDs
+    final genreMap = {
+      28: "Action",
+      12: "Adventure",
+      16: "Animation",
+      35: "Comedy",
+      80: "Crime",
+      99: "Documentary",
+      18: "Drama",
+      10751: "Family",
+      14: "Fantasy",
+      36: "History",
+      27: "Horror",
+      10402: "Music",
+      9648: "Mystery",
+      10749: "Romance",
+      878: "Science Fiction",
+      10770: "TV Movie",
+      53: "Thriller",
+      10752: "War",
+      37: "Western",
+    };
+
     final genres = ids.map((id) => genreMap[id] ?? "Unknown").toList();
-    print('Mapped Genres: $genres'); // Debug mapped genres
     return genres.isNotEmpty ? genres.join(", ") : "No genres available";
   }
 
@@ -71,7 +125,7 @@ class MovieCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              title,
+              widget.title,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -81,7 +135,7 @@ class MovieCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.network(
-                imageUrl,
+                widget.imageUrl,
                 height: 250,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -93,17 +147,17 @@ class MovieCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    "${getGenres(genreIds)}",
+                    getGenres(widget.genreIds),
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
                     ),
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 2, // Allow wrapping to two lines if needed
+                    maxLines: 2,
                   ),
                 ),
                 Text(
-                  "${formatDate(releaseDate)}",
+                  formatDate(widget.releaseDate),
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[600],
@@ -116,11 +170,19 @@ class MovieCard extends StatelessWidget {
               children: [
                 Icon(Icons.star, color: Colors.yellow, size: 20),
                 Text(
-                  " $rating",
+                  " ${widget.rating}",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
+                ),
+                Spacer(),
+                IconButton(
+                  icon: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorite ? Colors.red : Colors.grey,
+                  ),
+                  onPressed: _toggleFavorite,
                 ),
               ],
             ),
