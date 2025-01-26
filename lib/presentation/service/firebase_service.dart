@@ -5,22 +5,56 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Add a movie to the user's favorites
-  Future<void> addFavorite(String userId, Map<String, dynamic> movie) async {
+  Future<List<Map<String, dynamic>>> fetchMoviesFromFirestore() async {
     try {
-      final favoritesRef = _firestore.collection('favorites').doc(userId);
+      // Assuming a Firestore collection named 'movies'
+      final QuerySnapshot snapshot = await _firestore.collection('movies').get();
 
-      // Merge the movie into the favorites array
-      await favoritesRef.set({
-        'userId': userId,
-        'favorites': FieldValue.arrayUnion([movie]) // Add the movie
-      }, SetOptions(merge: true)); // Merge data instead of overwriting
-
-      print('Favorite added successfully for user: $userId');
+      // Map Firestore data to a list of maps
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        print('Fetched movie data: $data');
+        return {
+          'title': data['title'] ?? '',
+          'poster_path': data['poster_path'] ?? '',
+          'genre_ids': List<int>.from(data['genre_ids'] ?? []),
+          'release_date': data['release_date'] ?? '',
+          'vote_average': (data['vote_average'] as num?)?.toDouble() ?? 0.0,
+        };
+      }).toList();
     } catch (e) {
-      print('Failed to add favorite: $e');
+      print('Error fetching movies: $e');
+      return [];
     }
   }
+  
+  // Add a movie to the user's favorites
+    Future<void> addFavorite(String userId, Map<String, dynamic> movie) async {
+      try {
+        final favoritesRef = _firestore.collection('favorites').doc(userId);
+
+        // Save only necessary fields, including the movie ID
+        final movieData = {
+          'id': movie['id'], // Add the movie ID
+          'title': movie['title'] ?? '',
+          'poster_path': movie['poster_path'] ?? '',
+          'vote_average': movie['vote_average'] ?? 0.0,
+          'release_date': movie['release_date'] ?? '',
+          'genre_ids': movie['genre_ids'] ?? [],
+        };
+
+        // Merge the movie into the favorites array
+        await favoritesRef.set({
+          'userId': userId,
+          'favorites': FieldValue.arrayUnion([movieData])
+        }, SetOptions(merge: true));
+
+        print('Favorite added successfully for user: $userId');
+      } catch (e) {
+        print('Failed to add favorite: $e');
+      }
+    }
+
 
   // Remove a movie from the user's favorites
   Future<void> removeFavorite(String userId, Map<String, dynamic> movie) async {

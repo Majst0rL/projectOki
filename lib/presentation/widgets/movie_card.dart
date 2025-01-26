@@ -12,6 +12,7 @@ class MovieCard extends StatefulWidget {
   final List<int> genreIds;
   final String releaseDate;
   final double rating;
+  final String id; // ID filma
 
   const MovieCard({
     Key? key,
@@ -20,6 +21,7 @@ class MovieCard extends StatefulWidget {
     required this.genreIds,
     required this.releaseDate,
     required this.rating,
+    required this.id, // Dodaj ID kao parametar
   }) : super(key: key);
 
   @override
@@ -36,17 +38,18 @@ class _MovieCardState extends State<MovieCard> {
     _checkFavoriteStatus();
   }
 
+  // Provera da li je film u favoritima
   void _checkFavoriteStatus() async {
     final userId = Provider.of<UserProvider>(context, listen: false).userId;
     if (userId != null) {
-      final favoriteStatus =
-          await _firebaseService.isFavorite(userId, widget.title);
+      final favoriteStatus = await _firebaseService.isFavorite(userId, widget.id);
       setState(() {
         isFavorite = favoriteStatus;
       });
     }
   }
 
+  // Dodavanje ili uklanjanje iz favorita
   void _toggleFavorite() async {
     final userId = Provider.of<UserProvider>(context, listen: false).userId;
     if (userId == null) {
@@ -61,6 +64,7 @@ class _MovieCardState extends State<MovieCard> {
     });
 
     final movie = {
+      'id': widget.id, // Dodavanje ID-a filma
       'title': widget.title,
       'poster_path': widget.imageUrl,
       'genre_ids': widget.genreIds,
@@ -75,6 +79,7 @@ class _MovieCardState extends State<MovieCard> {
     }
   }
 
+  // Generisanje lista žanrova
   String getGenres(List<int> ids) {
     final genreMap = {
       28: "Action",
@@ -102,7 +107,8 @@ class _MovieCardState extends State<MovieCard> {
     return genres.isNotEmpty ? genres.join(", ") : "No genres available";
   }
 
-  String formatDate(String date) {
+  // Formatiranje datuma
+    String formatDate(String date) {
     try {
       final parsedDate = DateTime.parse(date);
       return DateFormat("yyyy").format(parsedDate);
@@ -124,6 +130,7 @@ class _MovieCardState extends State<MovieCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Naslov filma
             Text(
               widget.title,
               style: TextStyle(
@@ -132,6 +139,7 @@ class _MovieCardState extends State<MovieCard> {
               ),
             ),
             SizedBox(height: 10),
+            // Slika filma
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.network(
@@ -142,6 +150,7 @@ class _MovieCardState extends State<MovieCard> {
               ),
             ),
             SizedBox(height: 10),
+            // Žanrovi i datum
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -166,6 +175,7 @@ class _MovieCardState extends State<MovieCard> {
               ],
             ),
             SizedBox(height: 10),
+            // Ocena i dugme za dodavanje u favorite
             Row(
               children: [
                 Icon(Icons.star, color: Colors.yellow, size: 20),

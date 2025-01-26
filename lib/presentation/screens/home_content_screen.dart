@@ -1,3 +1,5 @@
+//presentation/screens/home_content_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../service/firebase_service.dart';
@@ -7,28 +9,28 @@ import 'movie_detail_screen.dart';
 class HomeContentScreen extends StatefulWidget {
   @override
   _HomeContentScreenState createState() => _HomeContentScreenState();
-}
+} 
 
 class _HomeContentScreenState extends State<HomeContentScreen> {
   final FirebaseService _firebaseService = FirebaseService();
   List<Map<String, dynamic>> _movies = [];
+  List<String> _favoriteMovieIds = []; // List of favorite movie IDs
 
   @override
   void initState() {
     super.initState();
     _loadMovies();
+    _loadFavorites();
   }
 
   Future<void> _loadMovies() async {
     try {
-      // Replace this with your actual Firebase fetching logic
-      final movies =
-          await FirebaseFirestore.instance.collection('movies').get();
+      final movies = await FirebaseFirestore.instance.collection('movies').get();
 
-      // Process and ensure genre fallback
       final processedMovies = movies.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         data['genre'] = data['genre'] ?? "0"; // Fallback for missing genre
+        data['id'] = doc.id; // Ensure each movie has an ID
         return data;
       }).toList();
 
@@ -37,6 +39,39 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
       });
     } catch (e) {
       print('Failed to load movies: $e');
+    }
+  }
+
+  Future<void> _loadFavorites() async {
+    try {
+      // Assuming a user ID is available (replace with actual user ID logic)
+      final userId = 'current_user_id'; 
+      final favorites = await _firebaseService.fetchFavorites(userId);
+
+      setState(() {
+        _favoriteMovieIds = favorites.map((movie) => movie['id'] as String).toList();
+      });
+    } catch (e) {
+      print('Failed to load favorites: $e');
+    }
+  }
+
+  Future<void> _toggleFavorite(Map<String, dynamic> movie) async {
+    final userId = 'current_user_id'; // Replace with actual user ID
+    final movieId = movie['id'];
+
+    if (_favoriteMovieIds.contains(movieId)) {
+      // Remove from favorites
+      await _firebaseService.removeFavorite(userId, movie);
+      setState(() {
+        _favoriteMovieIds.remove(movieId);
+      });
+    } else {
+      // Add to favorites
+      await _firebaseService.addFavorite(userId, movie);
+      setState(() {
+        _favoriteMovieIds.add(movieId);
+      });
     }
   }
 
@@ -54,17 +89,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
               itemCount: _movies.length,
               itemBuilder: (context, index) {
                 final movie = _movies[index];
-
-                final genreField =
-                    movie['genre'] ?? "0"; // Fallback to "0" if null
-
-                final genreIds = genreField
-                    .toString()
-                    .split(',')
-                    .map((id) => int.tryParse(id.trim()) ?? 0)
-                    .where((id) => id != 0)
-                    .toList();
-                print('Parsed genre IDs for "${movie['title']}": $genreIds');
+                final isFavorite = _favoriteMovieIds.contains(movie['id']); // Check if movie is in favorites
 
                 return GestureDetector(
                   onTap: () {
@@ -75,18 +100,28 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                       ),
                     );
                   },
-                  child: MovieCard(
-                    title: movie['title'],
-                    imageUrl: movie['poster_path'] ?? '',
-                    genreIds: genreIds, // Pass parsed genre IDs
-                    releaseDate: movie['release_date'] ?? '',
-                    rating: double.parse(
-                        (movie['vote_average']?.toDouble() ?? 0.0)
-                            .toStringAsFixed(1)),
+                  child: Stack(
+                    children: [
+                      MovieCard(
+                        title: movie['title'],
+                        imageUrl: movie['poster_path'] ?? '',
+                        genreIds: (movie['genre'] ?? "0")
+                            .toString()
+                            .split(',')
+                            .map((id) => int.tryParse(id.trim()) ?? 0)
+                            .where((id) => id != 0)
+                            .toList(),
+                        releaseDate: movie['release_date'] ?? '',
+                        rating: double.parse(
+                            (movie['vote_average']?.toDouble() ?? 0.0).toStringAsFixed(1)),
+                        id: movie['id'], // OVDE DODAJETE ID
+                      ),
+                    ],
                   ),
                 );
               },
             ),
+
     );
   }
 }
