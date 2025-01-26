@@ -1,6 +1,7 @@
 //presentation/screens/search_screen.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import './movie_detail_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -102,6 +103,13 @@ class _SearchScreenState extends State<SearchScreen> {
                               TextStyle(fontSize: 14, color: Colors.grey[600]),
                         ),
                         onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  MovieDetailScreen(movie: movie),
+                            ),
+                          );
                           // Navigate to movie details if needed
                         },
                       );

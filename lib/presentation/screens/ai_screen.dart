@@ -1,3 +1,5 @@
+//presentation/screens/ai_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,16 +16,37 @@ class _AiScreenState extends State<AiScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String _selectedMovieId = ""; // Selected movie ID for recommendations
   List<Map<String, dynamic>> _recommendedMovies = [];
+  List<Map<String, dynamic>> _userFavorites = []; // Favorites for selection
   int _page = 1;
 
-  // Sample movies for selection (can be replaced with dynamic user preferences)
-  final List<Map<String, dynamic>> sampleMovies = [
-    {"id": "550", "title": "Fight Club"},
-    {"id": "299534", "title": "Avengers: Endgame"},
-    {"id": "424", "title": "Schindler's List"},
-    {"id": "24428", "title": "The Avengers"},
-    {"id": "157336", "title": "Interstellar"},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserFavorites();
+  }
+
+  Future<void> _fetchUserFavorites() async {
+    try {
+      final User? user = _auth.currentUser;
+      if (user == null) {
+        debugPrint("No user logged in.");
+        return;
+      }
+
+      final doc = await _firestore.collection('favorites').doc(user.uid).get();
+      if (doc.exists) {
+        final favorites = List<Map<String, dynamic>>.from(
+            doc.data()?['movies'] ?? []); // Assuming movies is a list in favorites
+        setState(() {
+          _userFavorites = favorites;
+        });
+      } else {
+        debugPrint("No favorites found for user.");
+      }
+    } catch (e) {
+      debugPrint("Error fetching favorites: $e");
+    }
+  }
 
   Future<void> _fetchRecommendations() async {
     if (_selectedMovieId.isEmpty) {
@@ -89,9 +112,9 @@ class _AiScreenState extends State<AiScreen> {
           DropdownButton<String>(
             value: _selectedMovieId.isNotEmpty ? _selectedMovieId : null,
             hint: Text("Select a movie"),
-            items: sampleMovies.map((movie) {
+            items: _userFavorites.map((movie) {
               return DropdownMenuItem<String>(
-                value: movie['id'],
+                value: movie['id'].toString(),
                 child: Text(movie['title']),
               );
             }).toList(),
