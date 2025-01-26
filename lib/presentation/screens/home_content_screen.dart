@@ -42,6 +42,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
     }
   }
 
+
   Future<void> _loadFavorites() async {
     try {
       // Assuming a user ID is available (replace with actual user ID logic)

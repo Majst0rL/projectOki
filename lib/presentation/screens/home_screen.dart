@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.star_border),
-            label: 'Reviews',
+            label: 'Preferences',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite_border),
