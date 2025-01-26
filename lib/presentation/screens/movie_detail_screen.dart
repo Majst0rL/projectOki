@@ -23,6 +23,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
   @override
   void initState() {
     super.initState();
+    print('Movie ID: ${widget.movie['id']}'); // Debugging log
     _fetchReviews();
   }
 
@@ -34,6 +35,9 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
 
   // Fetch reviews for the specific movie
   void _fetchReviews() async {
+    print(
+        'Fetching reviews for movieId: ${widget.movie['id']}'); // Add this line
+
     setState(() {
       _isLoadingReviews = true;
     });
@@ -41,8 +45,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('reviews')
-          .where('movieId',
-              isEqualTo: widget.movie['id']) // Fetch specific movie reviews
+          .where('movieId', isEqualTo: widget.movie['id']) // Filter by movieId
           .orderBy('timestamp', descending: true)
           .get();
 
@@ -67,6 +70,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     final String comment = _commentController.text;
     final userId = Provider.of<UserProvider>(context, listen: false).userId;
     final username = Provider.of<UserProvider>(context, listen: false).username;
+    final movieId = widget.movie['id']; // Get the movie ID
 
     if (userId == null || username == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -82,10 +86,13 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       return;
     }
 
+    print(
+        'Submitting review: movieId=${widget.movie['id']}, userId=$userId, username=$username, rating=$_selectedRating, comment=$comment'); // Add this line
+
     try {
       // Add the review to Firestore
       await FirebaseFirestore.instance.collection('reviews').add({
-        'movieId': widget.movie['id'], // Associate the review with the movie
+        'movieId': movieId, // Associate the review with the movie
         'userId': userId,
         'username': username,
         'rating': _selectedRating,
@@ -93,17 +100,25 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         'timestamp': Timestamp.now(),
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Review submitted successfully!")),
-      );
+      setState(() {
+        _reviews.insert(0, {
+          'movieId': widget.movie['id'],
+          'userId': userId,
+          'username': username,
+          'rating': _selectedRating,
+          'comment': comment,
+          'timestamp': Timestamp.now(),
+        });
+      });
 
       _commentController.clear();
       setState(() {
         _selectedRating = 1;
       });
 
-      // Refresh reviews after submission
-      _fetchReviews();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Review submitted successfully!")),
+      );
     } catch (e) {
       print('Failed to submit review: $e');
       ScaffoldMessenger.of(context).showSnackBar(

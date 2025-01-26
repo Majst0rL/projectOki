@@ -28,6 +28,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
       // Process and ensure genre fallback
       final processedMovies = movies.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id; // Add document ID to the movie data
         data['genre'] = data['genre'] ?? "0"; // Fallback for missing genre
         return data;
       }).toList();
