@@ -48,9 +48,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Favorites'),
-      ),
       body: _userId == null
           ? Center(child: Text('Please log in to view your favorites.'))
           : _favorites.isEmpty

@@ -9,7 +9,7 @@ import 'movie_detail_screen.dart';
 class HomeContentScreen extends StatefulWidget {
   @override
   _HomeContentScreenState createState() => _HomeContentScreenState();
-} 
+}
 
 class _HomeContentScreenState extends State<HomeContentScreen> {
   final FirebaseService _firebaseService = FirebaseService();
@@ -25,7 +25,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
 
   Future<void> _loadMovies() async {
     try {
-      final movies = await FirebaseFirestore.instance.collection('movies').get();
+      final movies =
+          await FirebaseFirestore.instance.collection('movies').get();
 
       final processedMovies = movies.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
@@ -42,15 +43,15 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
     }
   }
 
-
   Future<void> _loadFavorites() async {
     try {
       // Assuming a user ID is available (replace with actual user ID logic)
-      final userId = 'current_user_id'; 
+      final userId = 'current_user_id';
       final favorites = await _firebaseService.fetchFavorites(userId);
 
       setState(() {
-        _favoriteMovieIds = favorites.map((movie) => movie['id'] as String).toList();
+        _favoriteMovieIds =
+            favorites.map((movie) => movie['id'] as String).toList();
       });
     } catch (e) {
       print('Failed to load favorites: $e');
@@ -79,10 +80,6 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Home"),
-        backgroundColor: Colors.black,
-      ),
       body: _movies.isEmpty
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(
@@ -90,7 +87,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
               itemCount: _movies.length,
               itemBuilder: (context, index) {
                 final movie = _movies[index];
-                final isFavorite = _favoriteMovieIds.contains(movie['id']); // Check if movie is in favorites
+                final isFavorite = _favoriteMovieIds
+                    .contains(movie['id']); // Check if movie is in favorites
 
                 return GestureDetector(
                   onTap: () {
@@ -114,7 +112,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                             .toList(),
                         releaseDate: movie['release_date'] ?? '',
                         rating: double.parse(
-                            (movie['vote_average']?.toDouble() ?? 0.0).toStringAsFixed(1)),
+                            (movie['vote_average']?.toDouble() ?? 0.0)
+                                .toStringAsFixed(1)),
                         id: movie['id'], // OVDE DODAJETE ID
                       ),
                     ],
@@ -122,7 +121,6 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                 );
               },
             ),
-
     );
   }
 }

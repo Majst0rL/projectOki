@@ -30,8 +30,8 @@ class _AiScreenState extends State<AiScreen> {
 
       final doc = await _firestore.collection('favorites').doc(user.uid).get();
       if (doc.exists) {
-        final favorites = List<Map<String, dynamic>>.from(
-            doc.data()?['favorites'] ?? []);
+        final favorites =
+            List<Map<String, dynamic>>.from(doc.data()?['favorites'] ?? []);
         setState(() {
           _userFavorites = favorites;
         });
@@ -67,9 +67,8 @@ class _AiScreenState extends State<AiScreen> {
         final data = json.decode(response.body);
         final List<dynamic> movies = data['results'];
         setState(() {
-          _recommendedMovies = movies
-              .map((movie) => Map<String, dynamic>.from(movie))
-              .toList();
+          _recommendedMovies =
+              movies.map((movie) => Map<String, dynamic>.from(movie)).toList();
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -86,10 +85,6 @@ class _AiScreenState extends State<AiScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("AI Recommendations"),
-        backgroundColor: Colors.black,
-      ),
       body: Column(
         children: [
           SizedBox(height: 20),

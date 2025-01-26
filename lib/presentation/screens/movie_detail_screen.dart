@@ -118,7 +118,11 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(movie['title'] ?? "Movie Details"),
+        title: Text(
+          movie['title'] ?? "Movie Details",
+          style: TextStyle(color: Colors.green),
+        ),
+        iconTheme: IconThemeData(color: Colors.green), // Back arrow color
         backgroundColor: Colors.black,
       ),
       body: Padding(
@@ -140,6 +144,13 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                       child: Center(child: Text("No image available"))),
               SizedBox(height: 20),
 
+              // Movie Overview
+              if (movie['overview'] != null)
+                Text(
+                  movie['overview'] ?? "",
+                  style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+                ),
+              SizedBox(height: 20),
               // Movie Details
               Text(
                 movie['title'] ?? "Untitled",

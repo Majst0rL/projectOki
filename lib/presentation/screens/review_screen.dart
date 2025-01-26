@@ -72,10 +72,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Preferences"),
-        backgroundColor: Colors.black,
-      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -100,7 +96,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text("You can select up to 5 genres only."),
+                              content:
+                                  Text("You can select up to 5 genres only."),
                             ),
                           );
                         }
@@ -139,7 +136,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
     );
   }
 
-  Widget _buildEditableList(String title, List<String> items, {required int maxItems}) {
+  Widget _buildEditableList(String title, List<String> items,
+      {required int maxItems}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
